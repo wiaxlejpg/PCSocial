@@ -1,67 +1,92 @@
+// ----- SUPABASE -----
 const supabaseUrl = "https://dbppspzsvyggugvmnwlx.supabase.co"
 const supabaseKey = "sb_publishable_NVH1LN7LFP5ifxabEkwMlg_69Q4uoKO"
-
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey)
 
-// ascolta i nuovi messaggi in tempo reale
-// crea un canale realtime
-const channel = supabaseClient
-  .channel('public:messages') // nome a piacere
-  .on(
-    'postgres_changes',        // tipo di evento
-    { event: 'INSERT', schema: 'public', table: 'messages' }, 
-    (payload) => {
-        const message = payload.new
-        const post = document.createElement("div")
-        post.className = "post"
-        post.innerHTML = `<div class="post-author">${message.mood} ${message.author}</div>
-                          <div class="post-text">${message.text}</div>`
-        document.getElementById("feed").prepend(post)
-    }
-  )
-  .subscribe()
+// ----- UTILI -----
+const feed = document.getElementById("feed")
+const sendButton = document.getElementById("sendButton")
 
-document.addEventListener("DOMContentLoaded", () => {
+// palette colori per mood
+const colors = { "❤️":"#ff4d4d", "😎":"#4dffb8", "😢":"#4db8ff", "🔥":"#ffb84d" }
 
-    loadMessages()
-
-    document.getElementById("sendButton").addEventListener("click", addMessage)
-
-})
-
+// ----- LOAD MESSAGES -----
 async function loadMessages(){
     const { data, error } = await supabaseClient
         .from("messages")
         .select("*")
-        .order("created_at",{ascending:false})
-
-    console.log(data, error)  // <-- debug
+        .order("created_at",{ascending:true}) // dal più vecchio al nuovo
 
     if(error){
-        console.error("Errore nel fetch dei messaggi:", error)
+        console.error("Errore fetch messaggi:", error)
         return
     }
 
-    data.forEach(message => {
-        const post = document.createElement("div")
-        post.className = "post"
-        post.innerHTML = `<div class="post-author">${message.mood} ${message.author}</div>
-                          <div class="post-text">${message.text}</div>`
-        document.getElementById("feed").appendChild(post)
-    })
+    data.forEach(message => addPostToFeed(message))
+    feed.scrollTop = feed.scrollHeight
 }
 
+// ----- ADD MESSAGE -----
 async function addMessage(){
-    const input = document.getElementById("messageInput")
-    const author = document.getElementById("author").value
-    const mood = document.getElementById("mood").value
-    const text = input.value
-    if(!text) return
+    const author = document.getElementById("author").value || "Anon"
+    const mood = document.getElementById("mood").value || ""
+    const text = document.getElementById("messageInput").value
+    const song = document.getElementById("songInput").value || null;
 
-    await supabaseClient
-      .from("messages")
-      .insert([{author,text,mood}])
-      .select() // così ottieni l'oggetto inserito
+    if(!text && !song) return // no blanks
 
-    input.value = ""
+    const { data, error } = await supabaseClient
+        .from("messages")
+        .insert([{author,text,mood, song}])
+        .select() // serve per ricevere l'oggetto appena inserito
+
+    if(error){
+        console.error(error)
+        return
+    }
+
+    document.getElementById("messageInput").value = ""
+    document.getElementById("songInput").value = "";
 }
+
+// ----- ADD POST TO FEED -----
+function addPostToFeed(message) {
+    const post = document.createElement("div");
+    post.className = "post";
+    post.dataset.mood = message.mood;
+  
+    let inner = `<div class="post-author">${message.mood} ${message.author}</div>`;
+    if(message.text) inner += `<div class="post-text">${message.text}</div>`;
+    if(message.song) {
+      inner += `<div class="song-bubble">
+                  <a href="${message.song}" target="_blank">🎵 Ascolta sta merda</a>
+                </div>`;
+    }
+  
+    post.innerHTML = inner;
+  
+    // glow automatico per mood
+    const colors = { "❤️":"#ff4d4d", "😎":"#4dffb8", "🔥":"#ffb84d", "😢":"#4db8ff", "💜":"#bba8ff" };
+    post.style.boxShadow = `0 0 15px ${colors[message.mood] || "#8a7dff"}55`;
+  
+    feed.appendChild(post);
+    feed.scrollTop = feed.scrollHeight;
+  }
+
+// ----- REALTIME -----
+supabaseClient
+  .channel('public:messages')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'messages' },
+    (payload) => {
+        addPostToFeed(payload.new)
+    }
+  )
+  .subscribe()
+
+// ----- INIT -----
+document.addEventListener("DOMContentLoaded", () => {
+    loadMessages()
+    sendButton.addEventListener("click", addMessage)
+})
