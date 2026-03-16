@@ -1,0 +1,101 @@
+body{
+    background:#0b0b12;
+    color:white;
+    font-family:sans-serif;
+    display:flex;
+    justify-content:center;
+   }
+   
+   .container{
+    width:500px;
+    margin-top:40px;
+   }
+   
+   h1{
+    text-align:center;
+   }
+   
+   .composer{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+   }
+   
+   input{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+   }
+   
+   button{
+    padding:10px 15px;
+    border:none;
+    border-radius:10px;
+    background:#8a7dff;
+    color:white;
+   }
+   
+   .post{
+    background:#1c1c25;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:10px;
+    box-shadow:0 0 10px #8a7dff55;
+    animation:pop 0.3s ease;
+   }
+
+   select{
+    padding:10px;
+    border-radius:10px;
+    border:none;
+   }
+   
+   .post-author{
+    font-weight:bold;
+    margin-bottom:5px;
+    color:#8a7dff;
+   }
+   
+   .post-text{
+    font-size:15px;
+   }
+
+   .post{
+    background:#1c1c25;
+    padding:15px;
+    border-radius:15px;
+    margin-bottom:10px;
+    animation:pop 0.3s ease;
+   }
+   
+   @keyframes pop{
+    from{
+     opacity:0;
+     transform:translateY(10px);
+    }
+    to{
+     opacity:1;
+     transform:translateY(0);
+    }
+   }
+
+   .floating{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#8a7dff;
+    padding:12px;
+    border-radius:15px;
+    animation:float 4s forwards;
+   }
+   
+   @keyframes float{
+    from{
+     opacity:0;
+     transform:translateY(20px);
+    }
+    to{
+     opacity:1;
+    }
+   }

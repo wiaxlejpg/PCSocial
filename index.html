@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+<meta charset="UTF-8">
+<title>PCSocial</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>PUTTAN SOCIAL COUTURE</h1>
+<p class="subtitle">Puttan Couture</p>
+
+<div class="composer">
+
+    <select id="author">
+        <option>Manue</option>
+        <option>Dio M</option>
+        <option>Magaluf</option>
+        <option>Martini</option>
+        <option>Pines</option>
+        <option>Crustel</option>
+        </select>
+    
+        <select id="mood">
+            <option value="💭">Random</option>
+            <option value="🎵">Music</option>
+            <option value="🔥">Drama</option>
+            <option value="🌙">Late Night</option>
+            </select>
+
+<input id="messageInput" placeholder="Scrivi un pensiero..." />
+<button id="sendButton">INVIA</button>
+</div>
+     </div>
+
+<div id="feed"></div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
